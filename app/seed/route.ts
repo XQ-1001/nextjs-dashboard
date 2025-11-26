@@ -42,12 +42,14 @@ async function seedInvoices() {
     );
   `;
 
+  // First, clear existing invoices to prevent duplicates
+  await sql`TRUNCATE TABLE invoices CASCADE;`;
+
   const insertedInvoices = await Promise.all(
     invoices.map(
       (invoice) => sql`
         INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
-        ON CONFLICT (id) DO NOTHING;
+        VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date});
       `,
     ),
   );
@@ -88,12 +90,14 @@ async function seedRevenue() {
     );
   `;
 
+  // Clear existing revenue data
+  await sql`TRUNCATE TABLE revenue CASCADE;`;
+
   const insertedRevenue = await Promise.all(
     revenue.map(
       (rev) => sql`
         INSERT INTO revenue (month, revenue)
-        VALUES (${rev.month}, ${rev.revenue})
-        ON CONFLICT (month) DO NOTHING;
+        VALUES (${rev.month}, ${rev.revenue});
       `,
     ),
   );
